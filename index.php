@@ -20,8 +20,6 @@ require_once 'default-config.php';
         height: 100%;
       }
 
-      .management-form {
-      }
       .management-form table {
         background-color: #DDD;
         border: 1px solid grey;
@@ -125,20 +123,22 @@ require_once 'default-config.php';
 <?php endif; ?>
 <?php if (isset($config['jquery_crossorigin'])): ?>
       crossorigin="<?php echo $config['jquery_crossorigin']; ?>">
-<?php endif; ?></script>
-    <script src="<?php echo $config['bootstrap_base']; ?>/js/bootstrap.min.js"></script>
-<script>
-var modeSelButtons = jQuery('.mode-sel-bar button');
+<?php endif; ?>
+    </script>
+    <script src="<?php echo $config['bootstrap_base']; ?>/js/bootstrap.min.js">
+    </script>
+    <script>
+      var modeSelButtons = jQuery('.mode-sel-bar button');
 
-modeSelButtons.click(function() {
-  var showTable = jQuery('#main-form > ' + jQuery(this).data('toggle'));
-  var allTables = jQuery('#main-form > *').not(showTable);
+      modeSelButtons.click(function() {
+        var showTable = jQuery('#main-form > ' + jQuery(this).data('toggle'));
+        var allTables = jQuery('#main-form > *').not(showTable);
 
-  allTables.fadeOut(function() {
-    showTable.fadeIn();
-  });
-});
-</script>
+        allTables.fadeOut(function() {
+          showTable.fadeIn();
+        });
+      });
+    </script>
   </body>
 </html>
 <?php // vim: set ts=2 sw=2 et syn=php: ?>
