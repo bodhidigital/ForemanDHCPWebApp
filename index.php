@@ -47,8 +47,8 @@ $lease_records   = $rc->get_lease_records();
         </div>
         <div class="col-xs-12 col-md-4 mode-sel-bar">
           <ul>
-            <li class="first"><button data-toggle="#reserve-table">Reserved</button></li>
-            <li class="last"><button data-toggle="#lease-table">Leased</button></li>
+            <li class="first"><button data-target="#reserve-table">Reserved</button></li>
+            <li class="last"><button data-target="#lease-table">Leased</button></li>
           </ul>
         </div>
         <div class="col-xs-12 col-md-8 management-tables">
@@ -68,19 +68,38 @@ $lease_records   = $rc->get_lease_records();
                 </tr>
               </thead>
               <tbody>
-<?php for ($i = 0; count($reserve_records) > $i; ++$i): ?>
-<?php   $reserve = $reserve_records[$i]; ?>
-<?php   $first = 0 == $i; ?>
-<?php   $last  = count($reserve_records) - 1 == $i; ?>
-<?php   $row_classes = ($first ? 'first' : '') . ($last ? ' last' : ''); ?>
+<?php   for ($i = 0; count($reserve_records) > $i; ++$i): ?>
+<?php     $reserve = $reserve_records[$i]; ?>
+<?php     $first = 0 == $i; ?>
+<?php     $last  = count($reserve_records) - 1 == $i; ?>
+<?php     $row_classes = ($first ? 'first' : '') . ($last ? ' last' : ''); ?>
+<?php     $info_modal_class = "reserve-" . $i . "-info"; ?>
                 <tr <?php if ($row_classes) echo "class=\"$row_classes\""; ?>>
                   <td class="first"><span class="glyphicon glyphicon-remove-sign"></span><span class="glyphicon glyphicon-edit"></span></td>
                   <td><span class="hostname"><?php echo $reserve->get('hostname'); ?></span></td>
                   <td><span class="ip"><?php echo $reserve->get('ip'); ?></span></td>
                   <td class="hidden-xs"><span class="mac"><?php echo $reserve->get('mac'); ?></span></td>
-                  <td class="last"><span class="glyphicon glyphicon-info-sign"></span></td>
+                  <td class="last">
+                    <a class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target=".<?php echo $info_modal_class; ?>"></a>
+                    <div class="modal fade <?php echo $info_modal_class; ?>" tabindex="-1" role="dialog">
+                      <div class="modal-dialog modal-content modal-lg">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">×</button>
+                          <h3 class="text-center">Additional Info</h3>
+                        </div>
+
+                        <div class="modal-body" role="document">
+                          <ul>
+  <?php     foreach ($reserve->getKeys() as $k): ?>
+                            <li><h4><?php echo htmlspecialchars($k); ?> =&gt; <?php echo htmlspecialchars($reserve->get($k)); ?></h4></li>
+  <?php     endforeach; ?>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
-<?php endfor; ?>
+<?php   endfor; ?>
               </tbody>
             </table>
           </div>
@@ -98,20 +117,39 @@ $lease_records   = $rc->get_lease_records();
                 </tr>
               </thead>
               <tbody>
-<?php for ($i = 0; count($lease_records) > $i; ++$i): ?>
-<?php   $lease = $lease_records[$i]; ?>
-<?php   $first = 0 == $i; ?>
-<?php   $last  = count($lease_records) - 1 == $i; ?>
-<?php   $row_classes = ($first ? 'first' : '') . ($last ? ' last' : ''); ?>
+<?php   for ($i = 0; count($lease_records) > $i; ++$i): ?>
+<?php     $lease = $lease_records[$i]; ?>
+<?php     $first = 0 == $i; ?>
+<?php     $last  = count($lease_records) - 1 == $i; ?>
+<?php     $row_classes = ($first ? 'first' : '') . ($last ? ' last' : ''); ?>
+<?php     $info_modal_class = "lease-" . $i . "-info"; ?>
                 <tr <?php if ($row_classes) echo "class=\"$row_classes\""; ?>>
                   <td class="first"><span class="glyphicon glyphicon-remove-sign"></span><span class="glyphicon glyphicon-edit"></span></td>
                   <td><span class="ip"><?php echo $lease->get('ip'); ?></span></td>
                   <td class="hidden-xs"><span class="mac"><?php echo $lease->get('mac'); ?></span></td>
                   <td class="hidden-xs"><span class="time"><?php echo date('H:i:s n/j', strtotime($lease->get('starts'))); ?></span></td>
                   <td><span class="time"><?php echo date('H:i:s n/j', strtotime($lease->get('ends'))); ?></span></td>
-                  <td class="last"><span class="glyphicon glyphicon-info-sign"></span></td>
+                  <td class="last">
+                    <a class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target=".<?php echo $info_modal_class; ?>"></a>
+                    <div class="modal fade <?php echo $info_modal_class; ?>" tabindex="-1" role="dialog">
+                      <div class="modal-dialog modal-content modal-lg">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">×</button>
+                          <h3 class="text-center">Additional Info</h3>
+                        </div>
+
+                        <div class="modal-body" role="document">
+                          <ul>
+  <?php     foreach ($lease->getKeys() as $k): ?>
+                            <li><h4><?php echo htmlspecialchars($k); ?> =&gt; <?php echo htmlspecialchars($lease->get($k)); ?></h4></li>
+  <?php     endforeach; ?>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
                 </tr>
-<?php endfor; ?>
+<?php   endfor; ?>
               </tbody>
             </table>
           </div>

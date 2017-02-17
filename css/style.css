@@ -43,6 +43,9 @@ html, body {
 .management-tables td.last {
   text-align: right;
 }
+.management-tables td.last .modal {
+  text-align: left;
+}
 
 .mode-sel-bar ul {
   padding: 0;
