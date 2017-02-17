@@ -19,6 +19,16 @@ html, body {
 .management-tables table .glyphicon {
   padding: 1px 4px;
 }
+@media screen and (max-width: 768px) {
+  .management-tables td {
+    font-size: 12px;
+  }
+}
+@media screen and (min-width: 769px) {
+  .management-tables td {
+    font-size: 14px;
+  }
+}
 .management-tables td.first {
   text-align: left;
 }

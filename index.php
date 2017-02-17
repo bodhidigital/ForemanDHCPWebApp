@@ -63,7 +63,7 @@ $lease_records   = $rc->get_lease_records();
                   <th></th>
                   <th>Hostname</th>
                   <th>IP<span class="hidden-xs"> Address</span></th>
-                  <th>MAC<span class="hidden-xs"> Address</span></th>
+                  <th class="hidden-xs">MAC Address</th>
                   <th></th>
                 </tr>
               </thead>
@@ -77,7 +77,7 @@ $lease_records   = $rc->get_lease_records();
                   <td class="first"><span class="glyphicon glyphicon-remove-sign"></span><span class="glyphicon glyphicon-edit"></span></td>
                   <td><span class="hostname"><?php echo $reserve->get('hostname'); ?></span></td>
                   <td><span class="ip"><?php echo $reserve->get('ip'); ?></span></td>
-                  <td><span class="mac"><?php echo $reserve->get('mac'); ?></span></td>
+                  <td class="hidden-xs"><span class="mac"><?php echo $reserve->get('mac'); ?></span></td>
                   <td class="last"><span class="glyphicon glyphicon-info-sign"></span></td>
                 </tr>
 <?php endfor; ?>
@@ -91,8 +91,8 @@ $lease_records   = $rc->get_lease_records();
                 <tr>
                   <th></th>
                   <th>IP<span class="hidden-xs"> Address</span></th>
-                  <th>MAC<span class="hidden-xs"> Address</span></th>
-                  <th>Starts</th>
+                  <th class="hidden-xs">MAC Address</th>
+                  <th class="hidden-xs">Starts</th>
                   <th>Ends</th>
                   <th></th>
                 </tr>
@@ -106,9 +106,9 @@ $lease_records   = $rc->get_lease_records();
                 <tr <?php if ($row_classes) echo "class=\"$row_classes\""; ?>>
                   <td class="first"><span class="glyphicon glyphicon-remove-sign"></span><span class="glyphicon glyphicon-edit"></span></td>
                   <td><span class="ip"><?php echo $lease->get('ip'); ?></span></td>
-                  <td><span class="mac"><?php echo $lease->get('mac'); ?></span></td>
-                  <td><span class="time"><?php echo $lease->get('starts'); ?></span></td>
-                  <td><span class="time"><?php echo $lease->get('ends'); ?></span></td>
+                  <td class="hidden-xs"><span class="mac"><?php echo $lease->get('mac'); ?></span></td>
+                  <td class="hidden-xs"><span class="time"><?php echo date('H:i:s n/j', strtotime($lease->get('starts'))); ?></span></td>
+                  <td><span class="time"><?php echo date('H:i:s n/j', strtotime($lease->get('ends'))); ?></span></td>
                   <td class="last"><span class="glyphicon glyphicon-info-sign"></span></td>
                 </tr>
 <?php endfor; ?>
