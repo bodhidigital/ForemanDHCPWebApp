@@ -77,22 +77,67 @@ class RecordCollector {
   }
 
   public function fetch() {
-    $general_data = $this->fetch_general();
+    $ch = curl_init();
+
+    try {
+      $general_data = $this->fetch_general($ch);
+    } catch (Exception $e) {
+      curl_close($ch);
+      throw $e;
+    }
+
+    curl_reset($ch);
 
     $this->reserve_records = Array();
     $this->lease_records   = Array();
 
-    foreach ($general_data['reservations'] as $reserve_detail)
-      $this->reserve_records[] = new ReserveRecord($reserve_detail);
+    foreach ($general_data['reservations'] as $reserve_general) {
+      if (!isset($reserve_general['ip']))
+        throw new Exception('Server returned reserve record without IP.');
 
-    foreach ($general_data['leases'] as $lease_detail)
-      $this->lease_records[]   = new LeaseRecord($lease_detail);
+      try {
+        $reserve_detail = $this->fetch_detail($reserve_general['ip'], $ch);
+      } catch (Exception $e) {
+        curl_close($ch);
+        throw $e;
+      }
+
+      curl_reset($ch);
+
+      try {
+        $this->reserve_records[] = new ReserveRecord($reserve_detail);
+      } catch (Exception $e) {
+        curl_close($ch);
+        throw $e;
+      }
+    }
+
+    foreach ($general_data['leases'] as $lease_general) {
+      if (!isset($lease_general['ip']))
+        throw new Exception('Server returned lease record without IP.');
+
+      try {
+        $lease_detail = $this->fetch_detail($lease_general['ip'], $ch);
+      } catch (Exception $e) {
+        curl_close($ch);
+        throw $e;
+      }
+
+      curl_reset($ch);
+
+      try {
+        $this->lease_records[]   = new LeaseRecord($lease_detail);
+      } catch (Exception $e) {
+        curl_close($ch);
+        throw $e;
+      }
+    }
+
+    curl_close ($ch);
   }
 
-  private function fetch_general() {
+  private function fetch_general($ch) {
     global $curl_error_codes;
-
-    $ch = curl_init();
 
     curl_setopt($ch, CURLOPT_URL, $this->base_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -101,16 +146,11 @@ class RecordCollector {
 
     $ch_errno = curl_errno($ch);
 
-    if ($ch_errno) {
-      curl_close ($ch);
-
+    if ($ch_errno)
       throw new Exception(
         'Failed to retrive general records from server: ' .
         $curl_error_codes[$ch_errno] .
         curl_error($ch));
-    }
-
-    curl_close ($ch);
 
     try {
       $general_data = json_decode($result, true);
@@ -123,10 +163,8 @@ class RecordCollector {
     return $general_data;
   }
 
-  private function fetch_detail($ip) {
+  private function fetch_detail($ip, $ch) {
     global $curl_error_codes;
-
-    $ch = curl_init();
 
     curl_setopt($ch, CURLOPT_URL, $this->base_url . '/' . $ip);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -135,16 +173,11 @@ class RecordCollector {
 
     $ch_errno = curl_errno($ch);
 
-    if ($ch_errno) {
-      curl_close($ch);
-
+    if ($ch_errno)
       throw new Exception(
         'Failed to retrive specific record from server, ' .
         'perhaps the records were just modified: ' .
         curl_error($ch));
-    }
-
-    curl_close($ch);
 
     try {
       $detail_data = json_decode($result, true);
