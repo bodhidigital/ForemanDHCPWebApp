@@ -1,0 +1,56 @@
+/* css/style.css */
+
+html, body {
+  height: 100%;
+}
+
+.management-tables table {
+  background-color: #DDD;
+  border: 1px solid grey;
+  width: 100%;
+}
+.management-tables thead th {
+  border-bottom: 1px solid grey;
+  padding-bottom: 2px;
+}
+.management-tables tbody tr.first td {
+  padding-top: 2px;
+}
+.management-tables table .glyphicon {
+  padding: 1px 4px;
+}
+.management-tables td.first {
+  text-align: left;
+}
+.management-tables td .hostname,
+.management-tables td .time {
+  font-family: 'sans';
+}
+.management-tables td .ip,
+.management-tables td .mac {
+  font-family: 'mono';
+}
+.management-tables td.last {
+  text-align: right;
+}
+
+.mode-sel-bar ul {
+  padding: 0;
+}
+.mode-sel-bar li {
+  width: 100%;
+  list-style-type: none;
+}
+.mode-sel-bar button {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid grey;
+  border-top: none;
+  font-size: 20px;
+  font-weight: bold;
+}
+.mode-sel-bar .first button {
+  border-top: 1px solid grey;
+}
+
+/* vim: set ts=2 sw=2 et syn=css: */

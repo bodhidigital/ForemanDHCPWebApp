@@ -5,6 +5,25 @@ if (is_file('config.php'))
 
 require_once 'default-config.php';
 
+require_once 'lib/dhcp.inc';
+
+$rc = new RecordCollector(
+  $config['dhcp_server'],
+  $config['dhcp_server_port'],
+  $config['dhcp_subnet']
+);
+
+$notify_error = NULL;
+
+try {
+  $rc->fetch();
+} catch (Exception $e) {
+  $notify_error = (string)$e;
+}
+
+$reserve_records = $rc->get_reserve_records();
+$lease_records   = $rc->get_lease_records();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,51 +35,7 @@ require_once 'default-config.php';
       type="text/css"
       href="<?php echo $config['bootstrap_base']; ?>/css/bootstrap.min.css">
     <style>
-      html, body {
-        height: 100%;
-      }
-
-      .management-tables table {
-        background-color: #DDD;
-        border: 1px solid grey;
-        width: 100%;
-      }
-      .management-tables tbody {
-        height: 100%;
-        overflow-y: scroll;
-        display: block;
-      }
-      .management-tables thead {
-        display: block;
-      }
-      .management-tables thead tr {
-        display: table;
-        width: 100%;
-      }
-      .management-tables thead tr th {
-        display: table-cell;
-        text-align: center;
-        vertical-align: middle;
-      }
-
-      .mode-sel-bar ul {
-        padding: 0;
-      }
-      .mode-sel-bar li {
-        width: 100%;
-        list-style-type: none;
-      }
-      .mode-sel-bar button {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid grey;
-        border-top: none;
-        font-size: 20px;
-        font-weight: bold;
-      }
-      .mode-sel-bar .first button {
-        border-top: 1px solid grey;
-      }
+<?php echo file_get_contents('css/style.css'); ?>
     </style>
   </head>
   <body>
@@ -77,19 +52,35 @@ require_once 'default-config.php';
           </ul>
         </div>
         <div class="col-xs-12 col-md-8 management-tables">
+<?php if (isset($notify_error)): ?>
+          <pre style="border-color:rgb(192,32,32)"><?php echo htmlspecialchars($notify_error); ?></pre>
+<?php else: ?>
           <div id="reserve-table">
             <h3 class="text-center">Reserved IPs<span class="hidden-xs"> (Static Leases)</span></h3>
             <table>
               <thead>
                 <tr>
-                  <th><span class="hidden-xs">Modify</span></th>
+                  <th></th>
                   <th>Hostname</th>
                   <th>IP<span class="hidden-xs"> Address</span></th>
                   <th>MAC<span class="hidden-xs"> Address</span></th>
-                  <th><span class="hidden-xs">Additional Information</span></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
+<?php for ($i = 0; count($reserve_records) > $i; ++$i): ?>
+<?php   $reserve = $reserve_records[$i]; ?>
+<?php   $first = 0 == $i; ?>
+<?php   $last  = count($reserve_records) - 1 == $i; ?>
+<?php   $row_classes = ($first ? 'first' : '') . ($last ? ' last' : ''); ?>
+                <tr <?php if ($row_classes) echo "class=\"$row_classes\""; ?>>
+                  <td class="first"><span class="glyphicon glyphicon-remove-sign"></span><span class="glyphicon glyphicon-edit"></span></td>
+                  <td><span class="hostname"><?php echo $reserve->get('hostname'); ?></span></td>
+                  <td><span class="ip"><?php echo $reserve->get('ip'); ?></span></td>
+                  <td><span class="mac"><?php echo $reserve->get('mac'); ?></span></td>
+                  <td class="last"><span class="glyphicon glyphicon-info-sign"></span></td>
+                </tr>
+<?php endfor; ?>
               </tbody>
             </table>
           </div>
@@ -98,19 +89,33 @@ require_once 'default-config.php';
             <table>
               <thead>
                 <tr>
-                  <th><span class="hidden-xs">Modify</span></th>
-                  <th>Hostname</th>
+                  <th></th>
                   <th>IP<span class="hidden-xs"> Address</span></th>
                   <th>MAC<span class="hidden-xs"> Address</span></th>
                   <th>Starts</th>
                   <th>Ends</th>
-                  <th><span class="hidden-xs">Additional Information</span></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
+<?php for ($i = 0; count($lease_records) > $i; ++$i): ?>
+<?php   $lease = $lease_records[$i]; ?>
+<?php   $first = 0 == $i; ?>
+<?php   $last  = count($lease_records) - 1 == $i; ?>
+<?php   $row_classes = ($first ? 'first' : '') . ($last ? ' last' : ''); ?>
+                <tr <?php if ($row_classes) echo "class=\"$row_classes\""; ?>>
+                  <td class="first"><span class="glyphicon glyphicon-remove-sign"></span><span class="glyphicon glyphicon-edit"></span></td>
+                  <td><span class="ip"><?php echo $lease->get('ip'); ?></span></td>
+                  <td><span class="mac"><?php echo $lease->get('mac'); ?></span></td>
+                  <td><span class="time"><?php echo $lease->get('starts'); ?></span></td>
+                  <td><span class="time"><?php echo $lease->get('ends'); ?></span></td>
+                  <td class="last"><span class="glyphicon glyphicon-info-sign"></span></td>
+                </tr>
+<?php endfor; ?>
               </tbody>
             </table>
           </div>
+<?php endif; ?>
         </div>
       </div>
     </div>
@@ -126,17 +131,7 @@ require_once 'default-config.php';
     <script src="<?php echo $config['bootstrap_base']; ?>/js/bootstrap.min.js">
     </script>
     <script>
-      var modeSelButtons = jQuery('.mode-sel-bar button');
-
-      modeSelButtons.click(function() {
-        var $jThis = jQuery(this);
-        var showTable = jQuery(jQuery(this).data('toggle'));
-        var otherTable = jQuery(modeSelButtons.not($jThis).data('toggle'));
-
-        otherTable.fadeOut(function() {
-          showTable.fadeIn();
-        });
-      });
+<?php echo file_get_contents('js/dhcp.js'); ?>
     </script>
   </body>
 </html>
