@@ -20,24 +20,24 @@ require_once 'default-config.php';
         height: 100%;
       }
 
-      .management-form table {
+      .management-tables table {
         background-color: #DDD;
         border: 1px solid grey;
         width: 100%;
       }
-      .management-form tbody {
+      .management-tables tbody {
         height: 100%;
         overflow-y: scroll;
         display: block;
       }
-      .management-form thead {
+      .management-tables thead {
         display: block;
       }
-      .management-form thead tr {
+      .management-tables thead tr {
         display: table;
         width: 100%;
       }
-      .management-form thead tr th {
+      .management-tables thead tr th {
         display: table-cell;
         text-align: center;
         vertical-align: middle;
@@ -76,43 +76,41 @@ require_once 'default-config.php';
             <li class="last"><button data-toggle="#lease-table">Leased</button></li>
           </ul>
         </div>
-        <div class="col-xs-12 col-md-8 management-form">
-          <form id="main-form">
-            <div id="reserve-table">
-              <h3 class="text-center">Reserved IPs<span class="hidden-xs"> (Static Leases)</span></h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th><label><input id="select-all-reserve" type="checkbox"><span class="hidden-xs"> Select all</span></label></th>
-                    <th>Hostname</th>
-                    <th>IP<span class="hidden-xs"> Address</span></th>
-                    <th>MAC<span class="hidden-xs"> Address</span></th>
-                    <th class="hidden-xs">Additional Information</th>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
-              </table>
-            </div>
-            <div hidden id="lease-table">
-              <h3 class="text-center">Dynamic Leases</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th><label><input id="select-all-lease" type="checkbox"><span class="hidden-xs"> Select all</span></label></th>
-                    <th>Hostname</th>
-                    <th>IP<span class="hidden-xs"> Address</span></th>
-                    <th>MAC<span class="hidden-xs"> Address</span></th>
-                    <th>Starts</th>
-                    <th>Ends</th>
-                    <th class="hidden-xs">Additional Information</th>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
-              </table>
-            </div>
-          </form>
+        <div class="col-xs-12 col-md-8 management-tables">
+          <div id="reserve-table">
+            <h3 class="text-center">Reserved IPs<span class="hidden-xs"> (Static Leases)</span></h3>
+            <table>
+              <thead>
+                <tr>
+                  <th><span class="hidden-xs">Modify</span></th>
+                  <th>Hostname</th>
+                  <th>IP<span class="hidden-xs"> Address</span></th>
+                  <th>MAC<span class="hidden-xs"> Address</span></th>
+                  <th><span class="hidden-xs">Additional Information</span></th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+          <div hidden id="lease-table">
+            <h3 class="text-center">Dynamic Leases</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th><span class="hidden-xs">Modify</span></th>
+                  <th>Hostname</th>
+                  <th>IP<span class="hidden-xs"> Address</span></th>
+                  <th>MAC<span class="hidden-xs"> Address</span></th>
+                  <th>Starts</th>
+                  <th>Ends</th>
+                  <th><span class="hidden-xs">Additional Information</span></th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -131,10 +129,11 @@ require_once 'default-config.php';
       var modeSelButtons = jQuery('.mode-sel-bar button');
 
       modeSelButtons.click(function() {
-        var showTable = jQuery('#main-form > ' + jQuery(this).data('toggle'));
-        var allTables = jQuery('#main-form > *').not(showTable);
+        var $jThis = jQuery(this);
+        var showTable = jQuery(jQuery(this).data('toggle'));
+        var otherTable = jQuery(modeSelButtons.not($jThis).data('toggle'));
 
-        allTables.fadeOut(function() {
+        otherTable.fadeOut(function() {
           showTable.fadeIn();
         });
       });
