@@ -45,13 +45,13 @@ $lease_records   = $rc->get_lease_records();
           <h1 class="text-center">DHCP Management for Foreman Proxy</h1>
           <hr>
         </div>
-        <div class="col-xs-12 col-md-4 mode-sel-bar">
+        <div class="col-xs-12 col-md-2 mode-sel-bar">
           <ul>
             <li class="first"><button data-target="#reserve-table">Reserved</button></li>
             <li class="last"><button data-target="#lease-table">Leased</button></li>
           </ul>
         </div>
-        <div class="col-xs-12 col-md-8 management-tables">
+        <div class="col-xs-12 col-md-10 management-tables">
 <?php if (isset($notify_error)): ?>
           <pre style="border-color:rgb(192,32,32)"><?php echo htmlspecialchars($notify_error); ?></pre>
 <?php else: ?>
