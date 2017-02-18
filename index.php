@@ -209,10 +209,11 @@ $record_manager->chClose();
           <h1 class="text-center">DHCP Management for Foreman Proxy</h1>
           <hr>
         </div>
-        <div class="col-xs-12 col-md-2 mode-sel-bar">
-          <ul>
-            <li class="first"><button data-target="#reserve-table">Reserved</button></li>
-            <li class="last"><button data-target="#lease-table">Leased</button></li>
+        <div class="col-xs-12 mode-sel-bar">
+          <ul class="nav nav-tabs">
+            <li class="active first"><a class="show-table" href="javascript:void(0)" data-target="#reserve-table">Reserved</a></li>
+            <li><a class="show-table" href="javascript:void(0)" data-target="#lease-table">Leased</a></li>
+            <li class="pull-right last"><a href="javascript:void(0)">Add New</a></li>
           </ul>
         </div>
 <?php if (isset($notify_error)): ?>
@@ -222,7 +223,7 @@ $record_manager->chClose();
         </div>
 <?php endif; ?>
 <?php if (!isset($notify_error)): ?>
-        <div class="col-xs-12 col-md-10 management-tables">
+        <div class="col-xs-12 management-tables">
 <?php   $first_table = true; ?>
 <?php   foreach ([
             RESERVE => [

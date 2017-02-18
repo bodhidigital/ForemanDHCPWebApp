@@ -47,25 +47,6 @@ html, body {
   text-align: left;
 }
 
-.mode-sel-bar ul {
-  padding: 0;
-}
-.mode-sel-bar li {
-  width: 100%;
-  list-style-type: none;
-}
-.mode-sel-bar button {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid grey;
-  border-top: none;
-  font-size: 20px;
-  font-weight: bold;
-}
-.mode-sel-bar .first button {
-  border-top: 1px solid grey;
-}
-
 .record-info {
   font-family: 'mono';
 }
