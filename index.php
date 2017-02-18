@@ -10,42 +10,62 @@ require_once 'lib/dhcp.inc';
 const RESERVE = 'reserve';
 const LEASE   = 'lease';
 
+$notify_error = NULL;
+
+$record_manager = new RecordManager(
+  $config['dhcp_server'],
+  $config['dhcp_server_port'],
+  $config['dhcp_subnet']
+);
+
 function handle_delete() {
   assert(isset($_POST['ip']));
 
   $target = $_POST['ip'];
-}
 
-function handle_update() {
-  assert(isset($_POST['ip']));
-  assert(isset($_POST['hostname']));
-  assert(isset($_POST['name']));
-  assert(isset($_POST['filename']));
-  assert(isset($_POST['nextServer']));
-  assert(isset($_POST['mac']));
-
-  $target       = $_POST['ip'];
-  $name         = $_POST['name'];
-  $hostname     = $_POST['hostname'];
-  $mac          = $_POST['mac'];
-  $filename     = $_POST['filename'];
-  $next_server  = $_POST['nextServer'];
+  try {
+    $record_manager->deleteReq($target);
+  } catch (Exception $e) {
+    $notify_error = (string)$e;
+  }
 }
 
 function handle_add() {
-  assert(isset($_POST['ip']));
   assert(isset($_POST['hostname']));
-  assert(isset($_POST['name']));
-  assert(isset($_POST['filename']));
-  assert(isset($_POST['nextServer']));
+  assert(isset($_POST['ip']));
   assert(isset($_POST['mac']));
 
-  $target       = $_POST['ip'];
-  $name         = $_POST['name'];
   $hostname     = $_POST['hostname'];
+  $target       = $_POST['ip'];
   $mac          = $_POST['mac'];
-  $filename     = $_POST['filename'];
-  $next_server  = $_POST['nextServer'];
+
+  $filename     = !empty($_POST['filename'])   ? $_POST['filename']   : NULL;
+  $next_server  = !empty($_POST['nextServer']) ? $_POST['nextServer'] : NULL;;
+
+  $add_data = Array();
+
+  $add_data['hostname']     = $hostname;
+  $add_data['ip']           = $target;
+  $add_data['mac']          = $mac;
+
+  if (!is_null($filename))
+    $add_data['filename']   = $filename;
+
+  if (!is_null($next_server))
+    $add_data['nextServer'] = $next_server;
+
+  try {
+    $record_manager->addReq($add_data);
+  } catch (Exception $e) {
+    $notify_error = (string)$e;
+  }
+}
+
+function handle_update() {
+  handle_delete();
+
+  if (is_null($notify_error))
+    handle_add();
 }
 
 function get_info_modal_id($type, $number) {
@@ -133,7 +153,7 @@ function format_info_modal($type, $number, $record) {
        '</div>';
 }
 
-$notify_error = NULL;
+$record_manager->chOpen();
 
 if (is_null($notify_error)) {
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -154,21 +174,19 @@ if (is_null($notify_error)) {
 }
 
 if (is_null($notify_error)) {
-  $rc = new RecordCollector(
-    $config['dhcp_server'],
-    $config['dhcp_server_port'],
-    $config['dhcp_subnet']
-  );
+  $record_collector = new RecordCollector($record_manager);
 
   try {
-    $rc->fetch();
+    $record_collector->fetch();
   } catch (Exception $e) {
     $notify_error = (string)$e;
   }
 
-  $reserve_records = $rc->get_reserve_records();
-  $lease_records   = $rc->get_lease_records();
+  $reserve_records = $record_collector->get_reserve_records();
+  $lease_records   = $record_collector->get_lease_records();
 }
+
+$record_manager->chClose();
 
 ?>
 <!DOCTYPE html>
