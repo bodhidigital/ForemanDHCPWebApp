@@ -7,22 +7,64 @@ require_once 'default-config.php';
 
 require_once 'lib/dhcp.inc';
 
-$rc = new RecordCollector(
-  $config['dhcp_server'],
-  $config['dhcp_server_port'],
-  $config['dhcp_subnet']
-);
+function handle_delete() {
+  assert(isset($_POST['ip']));
+
+  $target = $_POST['ip'];
+}
+
+function handle_update() {
+  assert(isset($_POST['ip']));
+  assert(isset($_POST['hostname']));
+  assert(isset($_POST['name']));
+  assert(isset($_POST['filename']));
+  assert(isset($_POST['nextServer']));
+  assert(isset($_POST['mac']));
+
+  $target       = $_POST['ip'];
+  $name         = $_POST['name'];
+  $hostname     = $_POST['hostname'];
+  $mac          = $_POST['mac'];
+  $filename     = $_POST['filename'];
+  $next_server  = $_POST['nextServer'];
+}
 
 $notify_error = NULL;
 
-try {
-  $rc->fetch();
-} catch (Exception $e) {
-  $notify_error = (string)$e;
+if (is_null($notify_error)) {
+  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    switch($_POST['form']) {
+      case "delete":
+        handle_delete();
+        break;
+      case "update":
+        handle_update();
+        break;
+      case "add":
+        handle_add();
+        break;
+      default:
+        $nofity_error = 'Unknown POST form: ' . $_POST['form'];
+    }
+  }
 }
 
-$reserve_records = $rc->get_reserve_records();
-$lease_records   = $rc->get_lease_records();
+if (is_null($notify_error)) {
+  $rc = new RecordCollector(
+    $config['dhcp_server'],
+    $config['dhcp_server_port'],
+    $config['dhcp_subnet']
+  );
+
+  try {
+    $rc->fetch();
+  } catch (Exception $e) {
+    $notify_error = (string)$e;
+  }
+
+  $reserve_records = $rc->get_reserve_records();
+  $lease_records   = $rc->get_lease_records();
+}
 
 ?>
 <!DOCTYPE html>
@@ -81,22 +123,6 @@ $lease_records   = $rc->get_lease_records();
                   <td class="hidden-xs"><span class="mac"><?php echo $reserve->get('mac'); ?></span></td>
                   <td class="last">
                     <a class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target=".<?php echo $info_modal_class; ?>"></a>
-                    <div class="modal fade <?php echo $info_modal_class; ?>" tabindex="-1" role="dialog">
-                      <div class="modal-dialog modal-content modal-lg">
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal">×</button>
-                          <h3 class="text-center">Additional Info</h3>
-                        </div>
-
-                        <div class="modal-body record-info" role="document">
-                          <ul>
-  <?php     foreach ($reserve->getKeys() as $k): ?>
-                            <li><h4><?php echo htmlspecialchars($k); ?> =&gt; <?php echo htmlspecialchars($reserve->get($k)); ?></h4></li>
-  <?php     endforeach; ?>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
                   </td>
                 </tr>
 <?php   endfor; ?>
@@ -131,22 +157,6 @@ $lease_records   = $rc->get_lease_records();
                   <td><span class="time"><?php echo date('H:i:s n/j', strtotime($lease->get('ends'))); ?></span></td>
                   <td class="last">
                     <a class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target=".<?php echo $info_modal_class; ?>"></a>
-                    <div class="modal fade <?php echo $info_modal_class; ?>" tabindex="-1" role="dialog">
-                      <div class="modal-dialog modal-content modal-lg">
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal">×</button>
-                          <h3 class="text-center">Additional Info</h3>
-                        </div>
-
-                        <div class="modal-body record-info" role="document">
-                          <ul>
-  <?php     foreach ($lease->getKeys() as $k): ?>
-                            <li><h4><?php echo htmlspecialchars($k); ?> =&gt; <?php echo htmlspecialchars($lease->get($k)); ?></h4></li>
-  <?php     endforeach; ?>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
                   </td>
                 </tr>
 <?php   endfor; ?>
@@ -157,6 +167,30 @@ $lease_records   = $rc->get_lease_records();
         </div>
       </div>
     </div>
+<?php if (!isset($notify_error)): ?>
+<?php   foreach (['reserve' => $reserve_records, 'lease' => $lease_records] as $name => $records): ?>
+<?php     for ($i = 0; count($records) > $i; ++$i): ?>
+<?php       $record = $records[$i]; ?>
+<?php       $info_modal_class = $name . '-' . $i . '-info'; ?>
+          <div class="modal fade <?php echo $info_modal_class; ?>" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-content modal-lg">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h3 class="text-center">Additional Info</h3>
+              </div>
+
+              <div class="modal-body record-info" role="document">
+                <ul>
+<?php       foreach ($record->getKeys() as $k): ?>
+                  <li><h4><?php echo htmlspecialchars($k); ?> =&gt; <?php echo htmlspecialchars($record->get($k)); ?></h4></li>
+<?php       endforeach; ?>
+                </ul>
+              </div>
+            </div>
+          </div>
+<?php     endfor; ?>
+<?php   endforeach; ?>
+<?php endif; ?>
     <script
       src="<?php echo $config['jquery_src']; ?>"
 <?php if (isset($config['jquery_integ'])): ?>

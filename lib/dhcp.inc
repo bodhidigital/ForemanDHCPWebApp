@@ -149,7 +149,7 @@ class RecordCollector {
     if ($ch_errno)
       throw new Exception(
         'Failed to retrive general records from server: ' .
-        $curl_error_codes[$ch_errno] .
+        $curl_error_codes[$ch_errno] . "\n" .
         curl_error($ch));
 
     try {
@@ -177,6 +177,7 @@ class RecordCollector {
       throw new Exception(
         'Failed to retrive specific record from server, ' .
         'perhaps the records were just modified: ' .
+        $curl_error_codes[$ch_errno] . "\n" .
         curl_error($ch));
 
     try {
