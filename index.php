@@ -163,9 +163,9 @@ $lease_records   = $rc->get_lease_records();
       integrity="<?php echo $config['jquery_integ']; ?>"
 <?php endif; ?>
 <?php if (isset($config['jquery_crossorigin'])): ?>
-      crossorigin="<?php echo $config['jquery_crossorigin']; ?>">
+      crossorigin="<?php echo $config['jquery_crossorigin']; ?>"
 <?php endif; ?>
-    </script>
+    ></script>
     <script src="<?php echo $config['bootstrap_base']; ?>/js/bootstrap.min.js">
     </script>
     <script>
