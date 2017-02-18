@@ -66,4 +66,8 @@ html, body {
   border-top: 1px solid grey;
 }
 
+.record-info {
+  font-family: 'mono';
+}
+
 /* vim: set ts=2 sw=2 et syn=css: */

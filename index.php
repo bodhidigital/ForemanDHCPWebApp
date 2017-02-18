@@ -88,7 +88,7 @@ $lease_records   = $rc->get_lease_records();
                           <h3 class="text-center">Additional Info</h3>
                         </div>
 
-                        <div class="modal-body" role="document">
+                        <div class="modal-body record-info" role="document">
                           <ul>
   <?php     foreach ($reserve->getKeys() as $k): ?>
                             <li><h4><?php echo htmlspecialchars($k); ?> =&gt; <?php echo htmlspecialchars($reserve->get($k)); ?></h4></li>
@@ -138,7 +138,7 @@ $lease_records   = $rc->get_lease_records();
                           <h3 class="text-center">Additional Info</h3>
                         </div>
 
-                        <div class="modal-body" role="document">
+                        <div class="modal-body record-info" role="document">
                           <ul>
   <?php     foreach ($lease->getKeys() as $k): ?>
                             <li><h4><?php echo htmlspecialchars($k); ?> =&gt; <?php echo htmlspecialchars($lease->get($k)); ?></h4></li>
