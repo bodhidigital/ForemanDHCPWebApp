@@ -159,6 +159,7 @@ function handle_add() {
   $add_data = Array();
 
   $add_data['hostname']     = $hostname;
+  $add_data['name']         = $hostname;
   $add_data['ip']           = $target;
   $add_data['mac']          = $mac;
 

@@ -97,6 +97,7 @@ include 'index.inc';
 <?php     for ($i = 0; count($records) > $i; ++$i): ?>
 <?php       $record = $records[$i]; ?>
 <?php       format_info_modal($record_type, $i, $record); ?>
+<?php       format_edit_modal($record_type, $i, $record); ?>
 <?php     endfor; ?>
 <?php   endforeach; ?>
 <?php endif; ?>
