@@ -1,0 +1,6 @@
+# js/.htaccess
+
+Order allow,deny
+Deny from all
+
+# vim: set ts=2 sw=2 et syn=apache:

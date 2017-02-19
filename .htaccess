@@ -1,0 +1,8 @@
+# .htaccess
+
+<FilesMatch "^(index\.inc|config\.php|default-config\.php)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# vim: set ts=2 sw=2 et syn=apache:
