@@ -59,17 +59,17 @@ function format_row($type, $number, $record) {
        '</td>';
 
   if (RESERVE == $type)
-    echo '<td><span class="hostname">' . $record->get('hostname') . '</span></td>';
+    echo '<td class="hostname">' . $record->get('hostname') . '</td>';
 
-  echo '<td><span class="ip">' . $record->get('ip') . ' </span></td>' .
-       '<td ' . $xs_hidden_attr . '><span class="mac">' . $record->get('mac') . '</span></td>';
+  echo '<td class="ip">' . $record->get('ip') . '</td>' .
+       '<td ' . $xs_hidden_attr . ' class="mac">' . $record->get('mac') . '</td>';
 
   if (LEASE == $type) {
     $short_stime = date('H:i:s n/j', strtotime($record->get('starts')));
     $short_etime = date('H:i:s n/j', strtotime($record->get('ends')));
 
-    echo '<td ' . $xs_hidden_attr . '><span class="time">' . $short_stime . '</span></td>' .
-         '<td><span class="time">' . $short_etime . '</span></td>';
+    echo '<td ' . $xs_hidden_attr . ' class="time">' . $short_stime . '</td>' .
+         '<td class="time">' . $short_etime . '</td>';
   }
 
   echo '<td class="last">' .

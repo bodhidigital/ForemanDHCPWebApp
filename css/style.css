@@ -25,19 +25,17 @@ html, body {
   }
 }
 
-.records.records-tables td.first {
-  text-align: center;
-}
-.records.records-tables td .hostname,
-.records.records-tables td .time {
-  font-family: 'sans';
-}
-.records.records-tables td .ip,
-.records.records-tables td .mac {
-  font-family: 'mono';
-}
+.records.records-tables td.first,
 .records.records-tables td.last {
   text-align: center;
+}
+.records.records-tables td.hostname,
+.records.records-tables td.time {
+  font-family: 'sans';
+}
+.records.records-tables td.ip,
+.records.records-tables td.mac {
+  font-family: 'mono';
 }
 
 .record-info {
