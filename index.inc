@@ -7,6 +7,8 @@ require_once 'default-config.php';
 
 require_once 'lib/dhcp.inc';
 
+date_default_timezone_set($config['tz']);
+
 $notify_error = NULL;
 
 $record_manager = new RecordManager(

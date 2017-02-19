@@ -3,6 +3,9 @@
 if (!isset($config))
   $config = Array();
 
+if (!isset($config['tz']))
+  $config['tz']                         = 'UTC';
+
 if (!isset($config['bootstrap_base']))
   $config['bootstrap_base']             = '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7';
 
