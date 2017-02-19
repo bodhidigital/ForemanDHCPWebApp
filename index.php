@@ -75,13 +75,20 @@ function get_info_modal_id($type, $number) {
 function format_header($type) {
   assert(RESERVE == $type || LEASE == $type);
 
+  global $config;
+
+  if ($config['datatables_enable'])
+    $xs_hidden_attr = '';
+  else
+    $xs_hidden_attr = 'class="hidden-xs"';
+
   echo '<th class="first"></th>';
 
   if (RESERVE == $type)
     echo '<th>Hostname</th>';
 
   echo '<th>IP<span class="hidden-xs"> Address</span></th>' .
-       '<th class="hidden-xs">MAC Address</th>';
+       '<th ' . $xs_hidden_attr . '>MAC Address</th>';
 
   if (LEASE == $type)
     echo '<th class="hidden-xs">Starts</th>' .
@@ -91,6 +98,17 @@ function format_header($type) {
 }
 
 function format_row($type, $number, $record) {
+  assert(RESERVE == $type || LEASE == $type);
+  assert(is_int($number));
+  assert(is_a($record, 'aRecord'));
+
+  global $config;
+
+  if ($config['datatables_enable'])
+    $xs_hidden_attr = '';
+  else
+    $xs_hidden_attr = 'class="hidden-xs"';
+
   assert(RESERVE == $type || LEASE == $type);
   assert(is_int($number));
   assert(is_a($record, 'aRecord'));
@@ -106,14 +124,14 @@ function format_row($type, $number, $record) {
     echo '<td><span class="hostname">' . $record->get('hostname') . '</span></td>';
 
   echo '<td><span class="ip">' . $record->get('ip') . ' </span></td>' .
-       '<td class="hidden-xs"><span class="mac">' . $record->get('mac') . '</span></td>';
+       '<td ' . $xs_hidden_attr . '><span class="mac">' . $record->get('mac') . '</span></td>';
 
   if (LEASE == $type) {
     $short_stime = date('H:i:s n/j', strtotime($record->get('starts')));
     $short_etime = date('H:i:s n/j', strtotime($record->get('ends')));
 
-    echo '<td class="hidden-xs"><span class="time">' . $short_stime . '</span></td>' .
-         '<td class="hidden-xs"><span class="time">' . $short_etime . '</span></td>';
+    echo '<td ' . $xs_hidden_attr . '><span class="time">' . $short_stime . '</span></td>' .
+         '<td><span class="time">' . $short_etime . '</span></td>';
   }
 
   echo '<td class="last">' .
@@ -198,6 +216,16 @@ $record_manager->chClose();
       rel="stylesheet"
       type="text/css"
       href="<?php echo $config['bootstrap_base']; ?>/css/bootstrap.min.css">
+<?php if ($config['datatables_enable']): ?>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="<?php echo $config['datatables_base']; ?>/css/dataTables.bootstrap4.min.css">
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="<?php echo $config['datatables_responsive_base']; ?>/css/responsive.dataTables.min.css">
+<?php endif; ?>
     <style>
 <?php echo file_get_contents('css/style.css'); ?>
     </style>
@@ -239,7 +267,7 @@ $record_manager->chClose();
 <?php   foreach ([RESERVE => $reserve_records, LEASE => $lease_records] as $record_type => $records): ?>
           <div <?php if ($first_table) $first_table = false; else echo 'hidden'; ?>
                class="record <?php echo $record_type; ?>-record">
-            <table class="table table-striped">
+            <table class="table table-striped table-bordered" cellspacing="0" width="100%">
               <thead>
                 <tr>
 <?php format_header($record_type); ?>
@@ -276,20 +304,31 @@ $record_manager->chClose();
 <?php     endfor; ?>
 <?php   endforeach; ?>
 <?php endif; ?>
-    <script
-      src="<?php echo $config['jquery_src']; ?>"
+    <script src="<?php echo $config['jquery_src']; ?>"
 <?php if (isset($config['jquery_integ'])): ?>
-      integrity="<?php echo $config['jquery_integ']; ?>"
+            integrity="<?php echo $config['jquery_integ']; ?>"
 <?php endif; ?>
 <?php if (isset($config['jquery_crossorigin'])): ?>
-      crossorigin="<?php echo $config['jquery_crossorigin']; ?>"
+            crossorigin="<?php echo $config['jquery_crossorigin']; ?>"
 <?php endif; ?>
-    ></script>
+    ><?php // > is not a typo ?>
+    </script>
     <script src="<?php echo $config['bootstrap_base']; ?>/js/bootstrap.min.js">
     </script>
     <script>
 <?php echo file_get_contents('js/dhcp.js'); ?>
     </script>
+<?php if ($config['datatables_enable']): ?>
+    <script src="<?php echo $config['datatables_base']; ?>/js/jquery.dataTables.min.js">
+    </script>
+    <script src="<?php echo $config['datatables_base']; ?>/js/dataTables.bootstrap4.min.js">
+    </script>
+    <script src="<?php echo $config['datatables_responsive_base']; ?>/js/dataTables.responsive.min.js">
+    </script>
+    <script>
+<?php echo file_get_contents('js/pick_datatables.js'); ?>
+    </script>
+<?php endif; ?>
   </body>
 </html>
 <?php // vim: set ts=2 sw=2 et syn=php: ?>
