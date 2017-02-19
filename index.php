@@ -209,13 +209,24 @@ $record_manager->chClose();
           <h1 class="text-center">DHCP Management for Foreman Proxy</h1>
           <hr>
         </div>
-        <div class="col-xs-12 mode-sel-bar">
+<?php if (!isset($notify_error)): ?>
+<?php   $first_title= true; ?>
+        <div class="col-xs-12 records records-titles">
+<?php   foreach ([RESERVE => "Reserved IPs", LEASE => "Dynamic Leases"] as $record_type => $title): ?>
+          <div <?php if ($first_title) $first_title = false; else echo 'hidden'; ?>
+               class="record <?php echo $record_type; ?>-record">
+            <h3 class="text-center"><?php echo $title; ?></h3>
+          </div>
+<?php   endforeach; ?>
+        </div>
+        <div class="col-xs-12" id="records-nav">
           <ul class="nav nav-tabs">
-            <li class="active first"><a class="show-table" href="javascript:void(0)" data-target="#reserve-table">Reserved</a></li>
-            <li><a class="show-table" href="javascript:void(0)" data-target="#lease-table">Leased</a></li>
+            <li class="active first"><a class="show-records" href="javascript:void(0)" data-target="reserve">Reserved</a></li>
+            <li><a class="show-records" href="javascript:void(0)" data-target="lease">Leased</a></li>
             <li class="pull-right last"><a href="javascript:void(0)">Add New</a></li>
           </ul>
         </div>
+<?php endif; ?>
 <?php if (isset($notify_error)): ?>
         <div class="col-xs-12">
           <h2>Error</h2>
@@ -223,36 +234,27 @@ $record_manager->chClose();
         </div>
 <?php endif; ?>
 <?php if (!isset($notify_error)): ?>
-        <div class="col-xs-12 management-tables">
+        <div class="col-xs-12 records records-tables">
 <?php   $first_table = true; ?>
-<?php   foreach ([
-            RESERVE => [
-              'name'    => "Reserved IPs",
-              'records' => $reserve_records,
-            ],
-            LEASE => [
-              'name'    => "Dynamic Leases",
-              'records' => $lease_records,
-          ],] as $record_type => $record_data): ?>
+<?php   foreach ([RESERVE => $reserve_records, LEASE => $lease_records] as $record_type => $records): ?>
           <div <?php if ($first_table) $first_table = false; else echo 'hidden'; ?>
-               id="<?php echo $record_type; ?>-table">
-            <h3 class="text-center"><?php echo $record_data['name']; ?></h3>
-            <table>
+               class="record <?php echo $record_type; ?>-record">
+            <table class="table table-striped">
               <thead>
                 <tr>
 <?php format_header($record_type); ?>
                 </tr>
               </thead>
               <tbody>
-<?php     for ($i = 0; count($record_data['records']) > $i; ++$i): ?>
-<?php       $records = $record_data['records'][$i]; ?>
+<?php     for ($i = 0; count($records) > $i; ++$i): ?>
+<?php       $record = $records[$i]; ?>
 <?php       $first_record = 0 == $i; ?>
-<?php       $last_record  = count($record_data['records']) - 1 == $i; ?>
+<?php       $last_record  = count($records) - 1 == $i; ?>
 <?php       $row_classes  = $first_record                 ? 'first' : ''; ?>
 <?php       $row_classes .= $first_record && $last_record ? ' '     : ''; ?>
 <?php       $row_classes .= $last_record                  ? 'last'  : ''; ?>
                 <tr <?php if (!empty($row_classes)) echo "class=\"$row_classes\""; ?>>
-<?php       format_row($record_type, $i, $records); ?>
+<?php       format_row($record_type, $i, $record); ?>
                 </tr>
 <?php     endfor; ?>
               </tbody>

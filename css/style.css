@@ -4,46 +4,39 @@ html, body {
   height: 100%;
 }
 
-.management-tables table {
-  background-color: #DDD;
-  border: 1px solid grey;
-  width: 100%;
+.records.records-titles {
+  height: 56px;
 }
-.management-tables thead th {
-  border-bottom: 1px solid grey;
-  padding-bottom: 2px;
-}
-.management-tables tbody tr.first td {
-  padding-top: 2px;
-}
-.management-tables table .glyphicon {
+
+.records.records-tables table .glyphicon {
   padding: 1px 4px;
 }
 @media screen and (max-width: 768px) {
-  .management-tables td {
+  .records.records-tables td {
     font-size: 12px;
   }
 }
 @media screen and (min-width: 769px) {
-  .management-tables td {
+  .records.records-tables td {
     font-size: 14px;
   }
 }
-.management-tables td.first {
+
+.records.records-tables td.first {
   text-align: left;
 }
-.management-tables td .hostname,
-.management-tables td .time {
+.records.records-tables td .hostname,
+.records.records-tables td .time {
   font-family: 'sans';
 }
-.management-tables td .ip,
-.management-tables td .mac {
+.records.records-tables td .ip,
+.records.records-tables td .mac {
   font-family: 'mono';
 }
-.management-tables td.last {
+.records.records-tables td.last {
   text-align: right;
 }
-.management-tables td.last .modal {
+.records.records-tables td.last .modal {
   text-align: left;
 }
 

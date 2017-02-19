@@ -1,17 +1,36 @@
 // js/dhcp.js
 
-var modeSelButtons = jQuery('.mode-sel-bar a.show-table');
+jQuery(document).ready(function() {
+  var recordsNav      = jQuery('#records-nav').find('ul.nav, ol.nav');
+  var modeSelButtons  = recordsNav.find('.show-records');
+  var allRecords      = jQuery('.record');
 
-modeSelButtons.click(function() {
-  var $jThis = jQuery(this);
-  var showTable = jQuery(jQuery(this).data('target'));
-  var otherTable = jQuery(modeSelButtons.not($jThis).data('target'));
+  modeSelButtons.click(function() {
+    var $jThis = jQuery(this);
 
-  $jThis.closest('ul, ol').find('li.active').removeClass('active');
-  $jThis.closest('li').addClass('active');
+    var closestLi = $jThis.closest('li');
 
-  otherTable.fadeOut(function() {
-    showTable.fadeIn();
+    if (closestLi.hasClass('active'))
+      return;
+
+    var showTarget  = $jThis.data('target');
+    var showRecord  = jQuery('.' + showTarget  + '-record');
+    var hideRecords = allRecords.not(showRecord);
+
+    if ($jThis.hasClass('ignore-click'))
+      return;
+
+    modeSelButtons.addClass('ignore-click');
+
+    recordsNav.find('li.active').removeClass('active');
+
+    jQuery.when(hideRecords.fadeOut()).then(function() {
+      closestLi.addClass('active');
+
+      showRecord.fadeIn();
+
+      modeSelButtons.removeClass('ignore-click');
+    });
   });
 });
 
