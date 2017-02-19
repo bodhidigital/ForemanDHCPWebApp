@@ -65,8 +65,8 @@ function format_row($type, $number, $record) {
        '<td ' . $xs_hidden_attr . ' class="mac">' . $record->get('mac') . '</td>';
 
   if (LEASE == $type) {
-    $short_stime = date('H:i:s n/j', strtotime($record->get('starts')));
-    $short_etime = date('H:i:s n/j', strtotime($record->get('ends')));
+    $short_stime = date('m/j H:i:s', strtotime($record->get('starts')));
+    $short_etime = date('m/j H:i:s', strtotime($record->get('ends')));
 
     echo '<td ' . $xs_hidden_attr . ' class="time">' . $short_stime . '</td>' .
          '<td class="time">' . $short_etime . '</td>';
