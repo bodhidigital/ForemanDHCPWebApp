@@ -11,7 +11,7 @@ jQuery(document).ready(function() {
     } ]
   });
 
-  pickDataTables.find('thead tr th:contains(\'IP \')').click();
+  pickDataTables.find('thead tr th:contains(\'MAC \')').click();
 });
 
 // vim: set ts=2 sw=2 et syn=javascript:
