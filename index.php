@@ -77,10 +77,13 @@ function format_header($type) {
 
   global $config;
 
-  if ($config['datatables_enable'])
-    $xs_hidden_attr = '';
-  else
-    $xs_hidden_attr = 'class="hidden-xs"';
+  if ($config['datatables_enable']) {
+    $xs_hidden_attr   = '';
+    $xs_visible_attr  = 'class="visible-xs"';
+  } else {
+    $xs_hidden_attr   = 'class="hidden-xs"';
+    $xs_visible_attr  = 'hidden';
+  }
 
   echo '<th class="first"></th>';
 
@@ -91,10 +94,10 @@ function format_header($type) {
        '<th ' . $xs_hidden_attr . '>MAC Address</th>';
 
   if (LEASE == $type)
-    echo '<th class="hidden-xs">Starts</th>' .
+    echo '<th ' . $xs_hidden_attr . '>Starts</th>' .
          '<th>Ends</th>';
 
-  echo '<th class="last"></th>';
+  echo '<th class="last"><span ' . $xs_visible_attr . '>Info</span></th>';
 }
 
 function format_row($type, $number, $record) {
