@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
       type: 'ip-address',
       targets: 2
     } ],
-    aoColumnDefs: [ { 
+    aoColumnDefs: [ {
       bSortable: false,
       aTargets: [ 0, -1 ]
     }, {
@@ -27,24 +27,17 @@ jQuery(document).ready(function() {
       type: 'ip-address',
       targets: 1
     } ],
-    aoColumnDefs: [ { 
+    aoColumnDefs: [ {
       bSortable: false,
       aTargets: [ 0, -1 ]
+    }, {
+      sType: "ip-addr",
+      aTargets: [ 1 ]
     } ]
   });
 
 
   function cmp_ips(x, y) {
-    function valid_ip(ip_arr) {
-      if (4 != ip_arr.length)
-        throw 'Invalid IP address `' + ip_arr.join('.') + '\'.';
-
-      ip_arr.forEach(function(it, i) {
-        if (0 == it.length || isNaN(it))
-          throw 'Invalid IP address `' + ip_arr.join('.') + '\'.';
-      });
-    }
-
     var x_arr = x.split('.'),
         y_arr = y.split('.');
 
@@ -67,32 +60,6 @@ jQuery(document).ready(function() {
   }
 
   function cmp_hostnames(x, y) {
-    function valid_hostname(hostname_arr) {
-      if (0 == hostname_arr.length)
-        throw 'Invalid hostname`' + hostname_arr.join('.') + '\'.';
-
-      var total_length = hostname_arr.length - 1;
-
-      hostname_arr.forEach(function(it, i) {
-        if (1 > it.length || 63 < it.length)
-          throw 'Invalid hostname`' + hostname_arr.join('.') + '\'.';
-        else if ('-' == it[0])
-          throw 'Invalid hostname`' + hostname_arr.join('.') + '\'.';
-        else if ('-' == it[it.length - 1])
-          throw 'Invalid hostname`' + hostname_arr.join('.') + '\'.';
-        else if (0 != it.replace(/[a-zA-Z0-9\-]/g, '').length)
-          throw 'Invalid hostname`' + hostname_arr.join('.') + '\'.';
-
-        if (0 < total_length)
-          ++total_length;
-
-        total_length += it.length;
-      });
-
-      if (253 < total_length)
-        throw 'Invalid hostname`' + hostname_arr.join('.') + '\'.';
-    }
-
     var x_arr = x.split('.'),
         y_arr = y.split('.');
 

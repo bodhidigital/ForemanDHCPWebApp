@@ -112,6 +112,9 @@ include 'index.inc';
     <script src="<?php echo $config['bootstrap_base']; ?>/js/bootstrap.min.js">
     </script>
     <script>
+<?php echo file_get_contents('js/validate.js'); ?>
+    </script>
+    <script>
 <?php echo file_get_contents('js/dhcp.js'); ?>
     </script>
 <?php if ($config['datatables_enable']): ?>
@@ -120,8 +123,6 @@ include 'index.inc';
     <script src="<?php echo $config['datatables_base']; ?>/js/dataTables.bootstrap4.min.js">
     </script>
     <script src="<?php echo $config['datatables_responsive_base']; ?>/js/dataTables.responsive.min.js">
-    </script>
-    <script src="//cdn.datatables.net/plug-ins/1.10.13/sorting/ip-address.js">
     </script>
     <script>
 <?php echo file_get_contents('js/pick_datatables.js'); ?>
