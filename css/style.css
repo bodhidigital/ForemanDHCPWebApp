@@ -52,8 +52,14 @@ html, body {
   color: rgb(16, 16, 200);
 }
 
-.record-info {
+.mono {
   font-family: 'mono';
+}
+
+.btn.btn-cancel {
+  background-color: rgb(200, 16, 16);
+  border-color: rgb(116, 32, 32);
+  color: white;
 }
 
 /* vim: set ts=2 sw=2 et syn=css: */

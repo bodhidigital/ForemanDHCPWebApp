@@ -15,6 +15,10 @@ function get_edit_modal_id($type, $number) {
   return $type . '-' . $number . '-edit';
 }
 
+function get_delete_modal_id($type, $number) {
+  return $type . '-' . $number . '-delete';
+}
+
 function get_add_modal_id() {
   return 'reserve-add';
 }
@@ -63,13 +67,15 @@ function format_row($type, $number, $record) {
   assert(is_int($number));
   assert(is_a($record, 'aRecord'));
 
-  $info_modal_id = get_info_modal_id($type, $number);
-  $edit_modal_id = get_edit_modal_id($type, $number);
+  $info_modal_id    = get_info_modal_id(  $type, $number);
+  $edit_modal_id    = get_edit_modal_id(  $type, $number);
+  $delete_modal_id  = get_delete_modal_id($type, $number);
 
   echo '<td class="first">' .
          '<a class="gly-remove" ' .
             'href="javascript:void(0)" ' .
-            'data-toggle="modal">' .
+            'data-toggle="modal" ' .
+            'data-target="#' . $delete_modal_id . '">' .
            '<span class="glyphicon glyphicon-remove-sign"></span>' .
          '</a>'.
          '<a class="gly-edit" ' .
@@ -107,6 +113,31 @@ function format_row($type, $number, $record) {
        '</td>';
 }
 
+function show_info($record) {
+  assert(is_a($record, 'aRecord'));
+
+  echo <<<HTML
+<div class="mono">
+  <ul>
+HTML;
+
+  foreach ($record->getKeys() as $k) {
+    $esc_k = htmlspecialchars($k);
+    $esc_v = htmlspecialchars($record->get($k));
+
+    echo <<<HTML
+    <li>
+      <h4>$esc_k =&gt; $esc_v</h4>
+    </li>
+HTML;
+  }
+
+  echo <<<HTML
+  </ul>
+</div>
+HTML;
+}
+
 function format_info_modal($type, $number, $record) {
   assert(RESERVE == $type || LEASE == $type);
   assert(is_int($number));
@@ -114,27 +145,23 @@ function format_info_modal($type, $number, $record) {
 
   $info_modal_id = get_info_modal_id($type, $number);
 
-  echo '<div class="modal fade" id="' . $info_modal_id . '" tabindex="-1" role="dialog">' .
-         '<div class="modal-dialog modal-content modal-lg">' .
-           '<div class="modal-header">' .
-             '<button type="button" class="close" data-dismiss="modal">×</button>' .
-             '<h3 class="text-center">Additional Info</h3>' .
-           '</div>' .
-           '<div class="modal-body record-info" role="document">' .
-             '<ul>';
+  echo <<<HTML
+<div class="modal fade" id="$info_modal_id" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-content modal-lg">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h3 class="text-center">Additional Info</h3>
+    </div>
+    <div class="modal-body record-info" role="document">
+HTML;
 
-  foreach ($record->getKeys() as $k) {
-    echo       '<li>' .
-                 '<h4>' .
-                   htmlspecialchars($k) . ' =&gt; ' . htmlspecialchars($record->get($k)) .
-                 '</h4>' .
-               '</li>';
-  }
+  show_info($record);
 
-  echo       '</ul>' .
-           '</div>' .
-         '</div>' .
-       '</div>';
+  echo <<<HTML
+    </div>
+  </div>
+</div>
+HTML;
 }
 
 function format_host_form_modal($modal_id, $form, $type, $ip = '', $mac = '',
@@ -158,7 +185,7 @@ function format_host_form_modal($modal_id, $form, $type, $ip = '', $mac = '',
   <div class="modal-dialog modal-content modal-lg">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">×</button>
-        <h3 class="text-center">$title</h3>
+      <h3 class="text-center">$title</h3>
     </div>
     <div class="modal-body record-$form" role="document">
       <form method="post" action="{$_SERVER['PHP_SELF']}">
@@ -263,6 +290,45 @@ function format_edit_modal($type, $number, $record) {
 
   format_host_form_modal($edit_modal_id, FORM_UPDATE, $type, $ip, $mac,
                          $hostname, $filename, $next_server);
+}
+
+function format_delete_modal($type, $number, $record) {
+  assert(RESERVE == $type || LEASE == $type);
+  assert(is_int($number));
+  assert(is_a($record, 'aRecord'));
+
+  $modal_id = get_delete_modal_id($type, $number);
+
+  $ip    = htmlspecialchars($record->get('ip'));
+  $title = "Are you sure?";
+  $form  = FORM_DELETE;
+
+  echo <<<HTML
+<div class="modal fade" id="$modal_id" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-content modal-lg">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+      <h3 class="text-center">$title</h3>
+    </div>
+    <div class="modal-body record-$form" role="document">
+      <h4>Are you sure you want to delete this host:</h4>
+HTML;
+
+  show_info($record);
+
+  echo <<<HTML
+      <br>
+      <form method="post" action="{$_SERVER['PHP_SELF']}">
+        <input type="hidden" name="form" value="$form">
+        <input type="hidden" name="del_ip" value="$ip">
+        <input type="hidden" name="del_type" value="$type">
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary btn-cancel" data-dismiss="modal">Cancel</button>
+      </form>
+    </div>
+  </div>
+</div>
+HTML;
 }
 
 // vim: set ts=2 sw=2 et syn=php:
