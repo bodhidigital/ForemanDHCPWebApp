@@ -9,14 +9,14 @@ function valid_ip($ip) {
   for ($i = 0; count($ip_arr) > $i; ++$i) {
     $ip_seg = $ip_arr[$i];
 
-    if (0 == count($ip_seg) || !is_numeric($ip_seg))
+    if (0 == strlen($ip_seg) || !is_numeric($ip_seg))
       return FALSE;
 
-    $ip_seg_int = (int)ip_seg;
+    $ip_seg_int = (int)$ip_seg;
 
     if (0 > $ip_seg_int || 255 < $ip_seg_int)
       return FALSE;
-    else if (3 == i && (0 == $ip_seg_int || 255 == $ip_seg_int))
+    else if (3 == $i && (0 == $ip_seg_int || 255 == $ip_seg_int))
       return FALSE;
   }
 
@@ -34,16 +34,16 @@ function valid_hostname($hostname) {
   for ($i = 0; count($hostname_arr) > $i; ++$i) {
     $hostname_seg = $hostname_arr[$i];
 
-    if (1 > count($hostname_seg) || 63 < count($hostname_seg))
+    if (1 > strlen($hostname_seg) || 63 < strlen($hostname_seg))
       return FALSE;
     else if ('-' == $hostname_seg[0])
       return FALSE;
-    else if ('-' == $hostname_seg[count($hostname_seg) - 1])
+    else if ('-' == $hostname_seg[strlen($hostname_seg) - 1])
       return FALSE;
-    else if (0 != count(preg_replace('/[a-zA-Z0-9\-]/g', '', $hostname_seg)))
+    else if (0 != strlen(preg_replace('/[a-zA-Z0-9\-]/', '', $hostname_seg)))
       return FALSE;
 
-    $total_length += count($hostname_seg);
+    $total_length += strlen($hostname_seg);
   }
 
   if (253 < $total_length)
@@ -59,9 +59,9 @@ function valid_mac($mac) {
     return FALSE;
 
   foreach ($mac_arr as $mac_seg) {
-    if (2 != count($mac_seg))
+    if (2 != strlen($mac_seg))
       return FALSE;
-    else if (0 != count(preg_replace('/[a-f0-9]/g', '', $mac_seg)))
+    else if (0 != strlen(preg_replace('/[a-f0-9]/', '', $mac_seg)))
       return FALSE;
   }
 
@@ -86,7 +86,9 @@ function valid_next_server($next_server) {
 function handle_delete() {
   global $notify_error;
   global $record_manager;
+  global $config;
 
+  assert(isset($_POST['del_type']));
   assert(isset($_POST['del_ip']));
 
   $del_target = $_POST['del_ip'];
@@ -96,10 +98,32 @@ function handle_delete() {
     return;
   }
 
-  try {
-    $record_manager->deleteReq($del_target);
-  } catch (Exception $e) {
-    $notify_error = (string)$e;
+  if (RESERVE == $_POST['del_type']) {
+    try {
+      $record_manager->deleteReq($del_target);
+    } catch (Exception $e) {
+      $notify_error = (string)$e;
+    }
+  } else {
+    $proc = proc_open("omshell", [0 => array("pipe", "r")] , $pipes);
+
+    $omshell_cmds =
+      (isset($config['omapi_port'])   ? "port ${config['omapi_port']}\n"     : '') .
+      (isset($config['omapi_server']) ? "server ${config['omapi_server']}\n" : '') .
+      "key ${config['omapi_key']} ${config['omapi_secret']}\n" .
+      "connect\n" .
+      "new lease\n" .
+      "set ip-address = $del_target\n" .
+      "open\n" .
+      "set ends = 00:00:00:00\n" .
+      "update\n";
+
+    assert(is_resource($proc));
+
+    fwrite($pipes[0], $omshell_cmds);
+    fclose($pipes[0]);
+
+    $return_value = proc_close($proc);
   }
 }
 
@@ -125,7 +149,11 @@ function handle_add() {
   foreach ($all_records as $record) {
     if ($mac      == $record['mac'] ||
         $target   == $record['ip']  ||
-        $hostname == $record['hostname']) {
+        (isset($record['hostname']) && $hostname == $record['hostname'])) {
+      // Continue if we've "cleared" this lease
+      if (!isset($record['ends']) && array_key_exists('ends', $record))
+        continue;
+
       $notify_error = "IP, MAC, or hostname already in use.";
       return;
     }
@@ -136,8 +164,8 @@ function handle_add() {
     return;
   }
 
-  if (!valid_ip($ip)) {
-    $notify_error = 'Invalid IP: `' . $ip . '\'.';
+  if (!valid_ip($target)) {
+    $notify_error = 'Invalid IP: `' . $target . '\'.';
     return;
   }
 
@@ -197,12 +225,16 @@ function handle_update() {
   foreach ($all_records as $record) {
     if ($mac      == $record['mac'] ||
         $target   == $record['ip']  ||
-        $hostname == $record['hostname']) {
+        (isset($record['hostname']) && $hostname == $record['hostname'])) {
       if ($mac      == $record['mac'] &&
           $target   == $record['ip']  &&
           $hostname == $record['hostname']) {
         break;
       } else if ($del_target != $record['ip']) {
+        // Continue if we've "cleared" this lease
+        if (!isset($record['ends']) && array_key_exists('ends', $record))
+          continue;
+
         $notify_error = "IP, MAC, or hostname already in use by another host.";
         return;
       }
@@ -210,6 +242,8 @@ function handle_update() {
   }
 
   handle_delete();
+
+  sleep(1);
 
   if (is_null($notify_error))
     handle_add();

@@ -30,4 +30,10 @@ if (!isset($config['datatables_base']) && $config['datatables_enable'])
 if (!isset($config['datatables_responsive_base']) && $config['datatables_enable'])
   $config['datatables_responsive_base'] = '//cdn.datatables.net/responsive/2.1.1';
 
+if (!isset($config['omapi_key']))
+  $config['omapi_key']                  = 'omapi_key';
+
+if (!isset($config['omapi_secret']))
+  $config['omapi_secret']               = 'YOURKEYHERE==';
+
 // vim: set ts=2 sw=2 et syn=php:

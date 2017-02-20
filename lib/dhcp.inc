@@ -45,8 +45,7 @@ class LeaseRecord extends aRecord {
       $detail,
       [ 'ip'     => 'IP address',
         'mac'    => 'MAC address',
-        'starts' => 'Start time',
-        'ends'   => 'End time', ]
+        'starts' => 'Start time' ]
     );
   }
 }
@@ -160,12 +159,12 @@ class RecordManager {
 
     foreach ($data as $k => $v) {
       if (!empty($post_data))
-        $post_data += '&';
+        $post_data .= '&';
 
       if (is_string($k))
-        $post_data += urlencode("$k=$v");
+        $post_data .= urlencode($k) . '=' . urlencode("$v");
       else
-        $post_data += urlencode($v);
+        $post_data .= urlencode("$v");
     }
 
     return $post_data;

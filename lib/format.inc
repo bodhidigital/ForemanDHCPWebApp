@@ -73,7 +73,10 @@ function format_row($type, $number, $record) {
 
   if (LEASE == $type) {
     $short_stime = date('m/j H:i:s', strtotime($record->get('starts')));
-    $short_etime = date('m/j H:i:s', strtotime($record->get('ends')));
+    if (in_array('ends', $record->getKeys()))
+      $short_etime = date('m/j H:i:s', strtotime($record->get('ends')));
+    else
+      $short_etime = "NULL";
 
     echo '<td ' . $xs_hidden_attr . ' class="time">' . $short_stime . '</td>' .
          '<td class="time">' . $short_etime . '</td>';
@@ -151,8 +154,10 @@ function format_edit_modal($type, $number, $record) {
            '</div>' .
            '<div class="modal-body record-add" role="document">';
 
-  echo       '<form method="post">' .
-               '<input type="hidden" name="form" value="add">' .
+  echo       '<form method="post" action="' . $_SERVER['PHP_SELF'] . '">' .
+               '<input type="hidden" name="form" value="update">' .
+               '<input type="hidden" name="del_ip" value="' . $ip . '">' .
+               '<input type="hidden" name="del_type" value="' . $type . '">' .
                '<div class="form-group">' .
                  '<label for="' . $edit_modal_id . '-hostname">' .
                    'Hostname' .

@@ -12,6 +12,10 @@ $config = Array(
   'dhcp_server'                 => 'localhost',
   'dhcp_server_port'            => 8000,
   'dhcp_subnet'                 => '192.168.1.0',
+  'omapi_key'                   => 'omapi_key',
+  'omapi_secret'                => 'YOURKEYHERE==',
+  'omapi_server'                => 'dc1',
+  'omapi_port'                  => 7911,
 );
 
 // vim: set ts=2 sw=2 et syn=php:
