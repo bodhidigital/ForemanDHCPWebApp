@@ -77,9 +77,9 @@ function valid_filename($filename) {
 
 function valid_next_server($next_server) {
   if (!valid_ip($next_server) &&
-      (!valid_hostname($next_sever) || $next_server == gethostbyname($next_server)))
+      (!valid_hostname($next_server) || $next_server == gethostbyname($next_server)))
     return FALSE;
-  
+
   return TRUE;
 }
 
@@ -253,13 +253,13 @@ function do_post() {
   global $notify_error;
 
   switch($_POST['form']) {
-  case "delete":
-    handle_delete();
-    break;
-  case "update":
+  case FORM_UPDATE:
     handle_update();
     break;
-  case "add":
+  case FORM_DELETE:
+    handle_delete();
+    break;
+  case FORM_ADD:
     handle_add();
     break;
   default:

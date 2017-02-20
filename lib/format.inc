@@ -1,7 +1,11 @@
 <?php // lib/format.inc
 
-const RESERVE = 'reserve';
-const LEASE   = 'lease';
+const RESERVE     = 'reserve';
+const LEASE       = 'lease';
+
+const FORM_UPDATE = 'update';
+const FORM_DELETE = 'delete';
+const FORM_ADD    = 'add';
 
 function get_info_modal_id($type, $number) {
   return $type . '-' . $number . '-info';
@@ -9,6 +13,10 @@ function get_info_modal_id($type, $number) {
 
 function get_edit_modal_id($type, $number) {
   return $type . '-' . $number . '-edit';
+}
+
+function get_add_modal_id() {
+  return 'reserve-add';
 }
 
 function format_header($type) {
@@ -59,8 +67,15 @@ function format_row($type, $number, $record) {
   $edit_modal_id = get_edit_modal_id($type, $number);
 
   echo '<td class="first">' .
-         '<span class="glyphicon glyphicon-remove-sign"></span>' .
-         '<a data-toggle="modal" data-target="#' . $edit_modal_id . '">' .
+         '<a class="gly-remove" ' .
+            'href="javascript:void(0)" ' .
+            'data-toggle="modal">' .
+           '<span class="glyphicon glyphicon-remove-sign"></span>' .
+         '</a>'.
+         '<a class="gly-edit" ' .
+            'href="javascript:void(0)" ' .
+            'data-toggle="modal" ' .
+            'data-target="#' . $edit_modal_id . '">' .
            '<span class="glyphicon glyphicon-edit"></span>' .
          '</a>'.
        '</td>';
@@ -83,7 +98,10 @@ function format_row($type, $number, $record) {
   }
 
   echo '<td class="last">' .
-         '<a data-toggle="modal" data-target="#' . $info_modal_id . '">' .
+         '<a class="gly-info" ' .
+            'href="javascript:void(0)" ' .
+            'data-toggle="modal" ' .
+            'data-target="#' . $info_modal_id . '">' .
            '<span class="glyphicon glyphicon-info-sign"></span>' .
          '</a>'.
        '</td>';
@@ -119,6 +137,103 @@ function format_info_modal($type, $number, $record) {
        '</div>';
 }
 
+function format_host_form_modal($modal_id, $form, $type, $ip = '', $mac = '',
+                                $hostname = '', $filename = '', $next_server = '') {
+  assert(FORM_UPDATE == $form || FORM_ADD == $form);
+  assert(RESERVE     == $type || LEASE    == $type);
+
+  $title = (FORM_UPDATE == $form) ? 'Edit Host' : 'New Host';
+
+  $hidden_inputs = 
+    "<input type=\"hidden\" name=\"form\" value=\"$form\">";
+  
+  if ("update" == $form) {
+    $hidden_inputs .=
+      "<input type=\"hidden\" name=\"del_ip\" value=\"$ip\">" .
+      "<input type=\"hidden\" name=\"del_type\" value=\"$type\">";
+  }
+
+  echo <<<HTML
+<div class="modal fade" id="$modal_id" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-content modal-lg">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">×</button>
+        <h3 class="text-center">$title</h3>
+    </div>
+    <div class="modal-body record-$form" role="document">
+      <form method="post" action="{$_SERVER['PHP_SELF']}">
+        $hidden_inputs
+        <div class="form-group">
+          <label for="{$modal_id}-hostname">Hostname</label>
+          <input type="text"
+                 class="form-control"
+                 id="{$modal_id}-hostname"
+                 name="hostname"
+                 value="$hostname">
+          <small class="form-text text-muted">
+            Must be valid as per RFC 1123.  Omit trailing dot.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="{$modal_id}-ip">IP Address</label>
+          <input type="text"
+                 class="form-control"
+                 id="{$modal_id}-ip"
+                 name="ip"
+                 value="$ip">
+          <small class="form-text text-muted">
+            In decimal-dot notation.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="{$modal_id}-mac">MAC address</label>
+          <input type="text"
+                 class="form-control"
+                 id="{$modal_id}-mac"
+                 name="mac"
+                 value="$mac">
+          <small class="form-text text-muted">
+            Six groups of colon seperated octets in hexadecimal format.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="{$modal_id}-filename">PXE Filename</label>
+          <input type="text"
+                 class="form-control"
+                 id="{$modal_id}-filename"
+                 name="filename"
+                 value="$filename">
+          <small class="form-text text-muted">
+            Must be a relavive path.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="{$modal_id}-nextServer">
+            PXE TFTP Server
+          </label>
+          <input type="text"
+                 class="form-control"
+                 id="{$modal_id}-nextServer"
+                 name="nextServer"
+                 value="$next_server">
+          <small class="form-text text-muted">
+            IP address or hostname.
+          </small>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+HTML;
+}
+
+function format_add_modal() {
+  $add_modal_id = get_add_modal_id();
+
+  format_host_form_modal($add_modal_id, FORM_ADD, RESERVE);
+}
+
 function format_edit_modal($type, $number, $record) {
   assert(RESERVE == $type || LEASE == $type);
   assert(is_int($number));
@@ -146,89 +261,8 @@ function format_edit_modal($type, $number, $record) {
   else
     $next_server  = '';
 
-  echo '<div class="modal fade" id="' . $edit_modal_id . '" tabindex="-1" role="dialog">' .
-         '<div class="modal-dialog modal-content modal-lg">' .
-           '<div class="modal-header">' .
-             '<button type="button" class="close" data-dismiss="modal">×</button>' .
-             '<h3 class="text-center">Edit Host</h3>' .
-           '</div>' .
-           '<div class="modal-body record-add" role="document">';
-
-  echo       '<form method="post" action="' . $_SERVER['PHP_SELF'] . '">' .
-               '<input type="hidden" name="form" value="update">' .
-               '<input type="hidden" name="del_ip" value="' . $ip . '">' .
-               '<input type="hidden" name="del_type" value="' . $type . '">' .
-               '<div class="form-group">' .
-                 '<label for="' . $edit_modal_id . '-hostname">' .
-                   'Hostname' .
-                 '</label>' .
-                 '<input type="text" ' .
-                        'class="form-control" ' .
-                        'id="' . $edit_modal_id . '-hostname" ' .
-                        'name="hostname" ' .
-                        'value="' . $hostname . '">' .
-                 '<small class="form-text text-muted">' .
-                   'Must be valid as per RFC 1123.  Omit trailing dot.' .
-                 '</small>' .
-               '</div>' .
-               '<div class="form-group">' .
-                 '<label for="' . $edit_modal_id . '-ip">' .
-                   'IP Address' .
-                 '</label>' .
-                 '<input type="text" ' .
-                        'class="form-control" ' .
-                        'id="' . $edit_modal_id . '-ip" ' .
-                        'name="ip" ' .
-                        'value="' . $ip . '">' .
-                 '<small class="form-text text-muted">' .
-                   'In decimal-dot notation.' .
-                 '</small>' .
-               '</div>' .
-               '<div class="form-group">' .
-                 '<label for="' . $edit_modal_id . '-mac">' .
-                   'MAC address' .
-                 '</label>' .
-                 '<input type="text" ' .
-                        'class="form-control" ' .
-                        'id="' . $edit_modal_id . '-mac" ' .
-                        'name="mac" ' .
-                        'value="' . $mac . '">' .
-                 '<small class="form-text text-muted">' .
-                   'Six groups of colon seperated octets in hexadecimal format.' .
-                 '</small>' .
-               '</div>' .
-               '<div class="form-group">' .
-                 '<label for="' . $edit_modal_id . '-filename">' .
-                   'PXE Filename' .
-                 '</label>' .
-                 '<input type="text" ' .
-                        'class="form-control" ' .
-                        'id="' . $edit_modal_id . '-filename" ' .
-                        'name="filename" ' .
-                        'value="' . $filename . '">' .
-                 '<small class="form-text text-muted">' .
-                   'Must be a relavive path.' .
-                 '</small>' .
-               '</div>' .
-               '<div class="form-group">' .
-                 '<label for="' . $edit_modal_id . '-nextServer">' .
-                   'PXE TFTP Server' .
-                 '</label>' .
-                 '<input type="text" ' .
-                        'class="form-control" ' .
-                        'id="' . $edit_modal_id . '-nextServer" ' .
-                        'name="nextServer" ' .
-                        'value="' . $next_server . '">' .
-                 '<small class="form-text text-muted">' .
-                   'IP address or hostname.' .
-                 '</small>' .
-               '</div>' .
-               '<button type="submit" class="btn btn-primary">Submit</button><br>' .
-             '</form>';
-
-  echo     '</div>' .
-         '</div>' .
-       '</div>';
+  format_host_form_modal($edit_modal_id, FORM_UPDATE, $type, $ip, $mac,
+                         $hostname, $filename, $next_server);
 }
 
 // vim: set ts=2 sw=2 et syn=php:

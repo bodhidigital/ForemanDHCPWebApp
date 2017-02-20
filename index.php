@@ -47,7 +47,7 @@ include 'index.inc';
           <ul class="nav nav-tabs">
             <li class="active first"><a class="show-records" href="javascript:void(0)" data-target="reserve">Reserved</a></li>
             <li><a class="show-records" href="javascript:void(0)" data-target="lease">Leased</a></li>
-            <li class="pull-right last"><a href="javascript:void(0)">Add New</a></li>
+            <li class="pull-right last"><a class="add-new" data-toggle="modal" data-target="#<?php echo get_add_modal_id(); ?>" href="javascript:void(0)">Add New</a></li>
           </ul>
         </div>
 <?php endif; ?>
@@ -89,6 +89,7 @@ include 'index.inc';
 <?php endif; ?>
       </div>
     </div>
+<?php format_add_modal(); ?>
 <?php if (!isset($notify_error)): ?>
 <?php   foreach ([
               RESERVE => $reserve_records,
